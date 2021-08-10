@@ -1,0 +1,9 @@
+package studentIMS;
+
+public class StuMain {
+    public static void main(String[] args) {
+        StudentsIMS studentsIMS = new StudentsIMS();
+        studentsIMS.initialize();
+        studentsIMS.operate();
+    }
+}
