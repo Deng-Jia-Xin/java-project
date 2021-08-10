@@ -1,0 +1,197 @@
+package studentIMS;
+
+import java.io.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
+
+public class StudentsIMS {
+
+    public void initialize(){
+        Map<Integer,Student> map = new HashMap<>();
+        map.put(0,new Student(01,"zhangtiezhu","1990-10-10",'1',"zhangtiezhu@123.com"));
+        map.put(1,new Student(02,"licuihua","1992-09-24",'0',"licuihua@123.com"));
+        map.put(2,new Student(03,"wangergou","1988-05-15",'1',"wangergou@123.com"));
+        saveMap(map);
+    }
+
+    public void operate(){
+        while(true){
+            BufferedReader bf = null;
+            try {
+                bf = new BufferedReader(new FileReader("D:\\JavaSoftware\\IdeaProjects\\testProject\\homework\\src\\studentIMS\\StuIMSInfo"));
+                String line = null;
+                while ((line = bf.readLine()) != null){
+                    System.out.println(line);
+                }
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }finally {
+                if(bf != null){
+                    try {
+                        bf.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+            while(true){
+                Scanner scanner = new Scanner(System.in);
+                System.out.println("\n"+"请输入功能编号：");
+                int i = scanner.nextInt();
+                if(i<0||i>4){
+                    System.out.println("请输入正确的编号");
+                }
+                switch (i){
+                    case 1:
+                        //查看学生列表
+                        check();
+                        break;
+                    case 2:
+                        //保存学生
+                        save();
+                        break;
+                    case 3:
+                        delete();
+                        break;
+                    case 4:
+                        checkDetail();
+                        break;
+                    case 0:
+                        System.exit(0);
+                }
+            }
+        }
+    }
+
+    private void check(){
+        System.out.println("------------------------------------");
+        System.out.println("学生信息列表展示");
+        System.out.println("学号\t\t\t姓名\t\t\t性别");
+        System.out.println("------------------------------------");
+        showStudentList();
+    }
+
+    private void showStudentList(){
+        Map<Integer,Student> studentMap = readStudentMap();
+        Set<Map.Entry<Integer,Student>> set = studentMap.entrySet();
+        for(Map.Entry<Integer,Student> map:set){
+            System.out.println(map.getKey()+"\t\t\t"+map.getValue().getName()+"\t\t\t"+map.getValue().getSex());
+        }
+    }
+
+    private Map<Integer,Student> readStudentMap(){
+        ObjectInputStream ois = null;
+        try {
+            ois = new ObjectInputStream(new FileInputStream("D:\\JavaSoftware\\IdeaProjects\\testProject\\homework\\src\\studentIMS\\StuInfoList"));
+            Map<Integer,Student> map = (Map<Integer, Student>) ois.readObject();
+            return map;
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }finally {
+            if(ois != null){
+                try {
+                    ois.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return null;
+    }
+
+    private void save(){
+        Scanner scanner = new Scanner(System.in);
+
+        Student student = new Student();
+
+        System.out.println("请输入学号：");
+        student.setStuNO(scanner.nextInt());
+
+        System.out.println("请输入姓名：");
+        student.setName(scanner.next());
+
+        System.out.println("请输入生日：");
+        student.setBirthday(scanner.next());
+
+        System.out.println("请输入性别：");
+        student.setSex(scanner.next().charAt(0));
+
+        System.out.println("请输入邮箱：");
+        student.setEmail(scanner.next());
+
+        Map<Integer,Student> map = readStudentMap();
+        map.put(student.getStuNO(),student);
+        saveMap(map);
+    }
+
+    private void saveMap(Map<Integer,Student> map){
+        ObjectOutputStream oos = null;
+        try {
+            oos = new ObjectOutputStream(new FileOutputStream("D:\\JavaSoftware\\IdeaProjects\\testProject\\homework\\src\\studentIMS\\StuInfoList"));
+            oos.writeObject(map);
+
+            oos.flush();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        finally {
+            if(oos != null){
+                try {
+                    oos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+    }
+    private void delete(){
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.println("请输入您要删除的学生的编号：");
+
+        int no = scanner.nextInt();
+        if(no<1||no>4){
+            System.out.println("请输入正确的学生编号");
+        }
+
+        Map<Integer,Student> map = readStudentMap();
+
+        map.remove(no);
+
+        saveMap(map);
+
+
+    }
+
+    private void checkDetail(){
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("请输入您想查看的学生的编号：");
+        int i = scanner.nextInt();
+        if(i<1||i>4){
+            System.out.println("请输入正确的学生编号");
+        }
+        System.out.println("-------------------------------------------");
+        System.out.println("查看某个学生详细信息");
+        Map<Integer,Student> map = readStudentMap();
+        Set<Map.Entry<Integer,Student>> set = map.entrySet();
+        for(Map.Entry<Integer,Student> m : set){
+            if(m.getKey() == i){
+                System.out.println("学号："+m.getKey());
+                System.out.println("姓名："+m.getValue().getName());
+                System.out.println("生日："+m.getValue().getBirthday());
+                System.out.println("性别："+m.getValue().getSex());
+                System.out.println("邮箱："+m.getValue().getEmail());
+            }
+        }
+    }
+
+}
